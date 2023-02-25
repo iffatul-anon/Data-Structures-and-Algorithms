@@ -33,8 +33,8 @@ void Qsort(int a[], int low, int high)
     if (low < high)
     {
         int position = Partition(a, low, high);
-        Qsort(a, low, position - 1);
-        Qsort(a, position + 1, high);
+        Qsort(a, low, position - 1);  // left subarray
+        Qsort(a, position + 1, high); // right subarray
     }
     return;
 }
