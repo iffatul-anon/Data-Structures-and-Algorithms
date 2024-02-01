@@ -1,104 +1,53 @@
-// DFS algorithm in C
+// DFS algorithm in C++
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
+#include <list>
+using namespace std;
 
-struct node {
-  int vertex;
-  struct node* next;
-};
-
-struct node* createNode(int v);
-
-struct Graph {
+class Graph {
   int numVertices;
-  int* visited;
+  list<int> *adjLists;
+  bool *visited;
 
-  // We need int** to store a two dimensional array.
-  // Similary, we need struct node** to store an array of Linked lists
-  struct node** adjLists;
+   public:
+  Graph(int V);
+  void addEdge(int src, int dest);
+  void DFS(int vertex);
 };
 
-// DFS algo
-void DFS(struct Graph* graph, int vertex) {
-  struct node* adjList = graph->adjLists[vertex];
-  struct node* temp = adjList;
-
-  graph->visited[vertex] = 1;
-  printf("Visited %d \n", vertex);
-
-  while (temp != NULL) {
-    int connectedVertex = temp->vertex;
-
-    if (graph->visited[connectedVertex] == 0) {
-      DFS(graph, connectedVertex);
-    }
-    temp = temp->next;
-  }
+// Initialize graph
+Graph::Graph(int vertices) {
+  numVertices = vertices;
+  adjLists = new list<int>[vertices];
+  visited = new bool[vertices];
 }
 
-// Create a node
-struct node* createNode(int v) {
-  struct node* newNode = malloc(sizeof(struct node));
-  newNode->vertex = v;
-  newNode->next = NULL;
-  return newNode;
+// Add edges
+void Graph::addEdge(int src, int dest) {
+  adjLists[src].push_front(dest);
 }
 
-// Create graph
-struct Graph* createGraph(int vertices) {
-  struct Graph* graph = malloc(sizeof(struct Graph));
-  graph->numVertices = vertices;
+// DFS algorithm
+void Graph::DFS(int vertex) {
+  visited[vertex] = true;
+  list<int> adjList = adjLists[vertex];
 
-  graph->adjLists = malloc(vertices * sizeof(struct node*));
+  cout << vertex << " ";
 
-  graph->visited = malloc(vertices * sizeof(int));
-
-  int i;
-  for (i = 0; i < vertices; i++) {
-    graph->adjLists[i] = NULL;
-    graph->visited[i] = 0;
-  }
-  return graph;
-}
-
-// Add edge
-void addEdge(struct Graph* graph, int src, int dest) {
-  // Add edge from src to dest
-  struct node* newNode = createNode(dest);
-  newNode->next = graph->adjLists[src];
-  graph->adjLists[src] = newNode;
-
-  // Add edge from dest to src
-  newNode = createNode(src);
-  newNode->next = graph->adjLists[dest];
-  graph->adjLists[dest] = newNode;
-}
-
-// Print the graph
-void printGraph(struct Graph* graph) {
-  int v;
-  for (v = 0; v < graph->numVertices; v++) {
-    struct node* temp = graph->adjLists[v];
-    printf("\n Adjacency list of vertex %d\n ", v);
-    while (temp) {
-      printf("%d -> ", temp->vertex);
-      temp = temp->next;
-    }
-    printf("\n");
-  }
+  list<int>::iterator i;
+  for (i = adjList.begin(); i != adjList.end(); ++i)
+    if (!visited[*i])
+      DFS(*i);
 }
 
 int main() {
-  struct Graph* graph = createGraph(4);
-  addEdge(graph, 0, 1);
-  addEdge(graph, 0, 2);
-  addEdge(graph, 1, 2);
-  addEdge(graph, 2, 3);
+  Graph g(4);
+  g.addEdge(0, 1);
+  g.addEdge(0, 2);
+  g.addEdge(1, 2);
+  g.addEdge(2, 3);
 
-  printGraph(graph);
-
-  DFS(graph, 2);
+  g.DFS(2);
 
   return 0;
 }
